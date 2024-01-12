@@ -21,16 +21,16 @@ func main() {
 }
 
 type Nendoroid struct {
-    name string
-    description string
-    itemLink string
-    blogLink string
-    details []Details
+    Name        string    `json:"name"`
+    Description string    `json:"description"`
+    ItemLink    string    `json:"itemLink"`
+    BlogLink    string    `json:"blogLink"`
+    Details     []Details `json:"details"`
 }
 
 type Details struct {
-    key string
-    value string
+    Key   string `json:"key"`
+    Value string `json:"value"`
 }
 
 func getNendoroidData(url string) Nendoroid {
@@ -82,21 +82,27 @@ func getNendoroidData(url string) Nendoroid {
     var nendoroid Nendoroid
 
     // Add name
-    nendoroid.name = name
+    nendoroid.Name = name
     // Add description
-    nendoroid.description = desc
+    nendoroid.Description = desc
     // Add itemLink
-    nendoroid.itemLink = url
+    nendoroid.ItemLink = url
     // Add blogLink
-    nendoroid.blogLink = blogLink
+    nendoroid.BlogLink = blogLink
     // Add details
     for i, key := range keys {
-        nendoroid.details = append(nendoroid.details, Details{key, values[i]})
+        nendoroid.Details = append(nendoroid.Details, Details{key, values[i]})
     }
 
 	return nendoroid 
 }
 
 func saveNendoroidData(nendo Nendoroid) {
-    
+    // create file if not exists (jsonl)
+
+    // open file to append
+
+    // serialize nendo
+
+    // add nendo to file
 }
