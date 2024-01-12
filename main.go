@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/gocolly/colly"
@@ -10,9 +12,9 @@ import (
 func main() {
     println("Scraping Goodsmile Nendoroid Figure Data")
     
-	url := "https://www.goodsmile.info/en/product/8819/Nendoroid+Zelda+Breath+of+the+Wild+Ver.html"
-    // url2 := "https://www.goodsmile.info/en/product/15354/Nendoroid+Nino+Nakano+Wedding+Dress+Ver.html"
-    // url3 := "https://www.goodsmile.info/en/product/15353/Nendoroid+Ninomae+Ina+nis.html"
+	// url := "https://www.goodsmile.info/en/product/8819/Nendoroid+Zelda+Breath+of+the+Wild+Ver.html"
+    url := "https://www.goodsmile.info/en/product/15354/Nendoroid+Nino+Nakano+Wedding+Dress+Ver.html"
+    // url := "https://www.goodsmile.info/en/product/15353/Nendoroid+Ninomae+Ina+nis.html"
 
     nendo := getNendoroidData(url)
     saveNendoroidData(nendo)
@@ -98,11 +100,42 @@ func getNendoroidData(url string) Nendoroid {
 }
 
 func saveNendoroidData(nendo Nendoroid) {
-    // create file if not exists (jsonl)
+
+    fileName := "test.jsonl"
 
     // open file to append
+    file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
+    if err != nil {
+        fmt.Println(err)
+    }
+    defer file.Close()
 
     // serialize nendo
+    data, err := json.Marshal(nendo)
+    if err != nil {
+        fmt.Println(err)
+    }
 
     // add nendo to file
+    _, err = file.Write(data)
+    if err != nil {
+        fmt.Println(err)
+    }
+
+    _, err = file.WriteString("\n")
+    if err != nil {
+        fmt.Println(err)
+    }
 }
+
+/*
+func createJsonlFile(fileName string) {
+    _, err := os.Stat(fileName)
+    if os.IsNotExist(err) {
+        _, err = os.Create(fileName)
+        if err != nil {
+            fmt.Println(err)
+        }
+    }
+}
+*/
