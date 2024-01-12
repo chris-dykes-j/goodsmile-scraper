@@ -79,7 +79,17 @@ func getNendoroidData(url string) Nendoroid {
     })
     defer c.OnHTMLDetach(".detailBox > dl")
 
+    // Get images
+    var imageLinks []string
+    c.OnHTML(".itemImg", func(e *colly.HTMLElement) {
+        img := e.Attr("src")
+        imageLinks = append(imageLinks, img)
+    })
+
 	c.Visit(url)
+
+    // Save images
+    saveImages(imageLinks)
 
     var nendoroid Nendoroid
 
@@ -121,3 +131,22 @@ func saveNendoroidData(nendo Nendoroid) {
         fmt.Println(err)
     }
 }
+
+/*
+func saveImages(links []string) {
+    userAgent := "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"
+
+    client := &http.Client{}
+
+    for _, link := range links {
+        req, _ := http.NewRequest("GET", link, nil)
+        req.Header.Set("User-Agent", userAgent)
+        res, _ := client.Do(req)
+
+        imgPath := filepath
+        imgFile, _ := os.Create(imgPath)
+
+        io.Copy(imgFile, res.Body)
+    }
+}
+*/
