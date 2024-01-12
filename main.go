@@ -100,7 +100,6 @@ func getNendoroidData(url string) Nendoroid {
 }
 
 func saveNendoroidData(nendo Nendoroid) {
-
     fileName := "test.jsonl"
 
     // open file to append
@@ -116,26 +115,9 @@ func saveNendoroidData(nendo Nendoroid) {
         fmt.Println(err)
     }
 
-    // add nendo to file
-    _, err = file.Write(data)
-    if err != nil {
-        fmt.Println(err)
-    }
-
-    _, err = file.WriteString("\n")
+    // add data to jsonl
+    _, err = file.WriteString(string(data) + "\n")
     if err != nil {
         fmt.Println(err)
     }
 }
-
-/*
-func createJsonlFile(fileName string) {
-    _, err := os.Stat(fileName)
-    if os.IsNotExist(err) {
-        _, err = os.Create(fileName)
-        if err != nil {
-            fmt.Println(err)
-        }
-    }
-}
-*/
