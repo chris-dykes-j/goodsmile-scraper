@@ -11,14 +11,21 @@ func main() {
     println("Scraping Goodsmile Nendoroid Figure Data")
     
 	url := "https://www.goodsmile.info/en/product/8819/Nendoroid+Zelda+Breath+of+the+Wild+Ver.html"
-    // url := "https://www.goodsmile.info/en/product/15354/Nendoroid+Nino+Nakano+Wedding+Dress+Ver.html"
-    // url := "https://www.goodsmile.info/en/product/15353/Nendoroid+Ninomae+Ina+nis.html"
+    // url2 := "https://www.goodsmile.info/en/product/15354/Nendoroid+Nino+Nakano+Wedding+Dress+Ver.html"
+    // url3 := "https://www.goodsmile.info/en/product/15353/Nendoroid+Ninomae+Ina+nis.html"
 
     nendo := getNendoroidData(url)
+    saveNendoroidData(nendo)
 
-    for _, n := range nendo {
-        fmt.Printf("%s: %s\n", n.key, n.value)
-    }
+    fmt.Println(nendo)
+}
+
+type Nendoroid struct {
+    name string
+    description string
+    itemLink string
+    blogLink string
+    details []Details
 }
 
 type Details struct {
@@ -26,7 +33,7 @@ type Details struct {
     value string
 }
 
-func getNendoroidData(url string) []Details {
+func getNendoroidData(url string) Nendoroid {
 	userAgent := "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"
 
 	c := colly.NewCollector()
@@ -34,9 +41,30 @@ func getNendoroidData(url string) []Details {
 		r.Headers.Set("User-Agent", userAgent)
 	})
 
+    // Get name
+    var name string
+    c.OnHTML(".title", func(e *colly.HTMLElement) {
+        name = strings.TrimSpace(e.Text)
+    })
+    defer c.OnHTMLDetach(".title")
+
+    // Get description
+    var desc string
+    c.OnHTML(".description", func(e *colly.HTMLElement) {
+        desc = strings.TrimSpace(e.Text)
+    })
+    defer c.OnHTMLDetach(".description")
+
+    // Get blogLinks
+    var blogLink string
+    c.OnHTML("#bloglink", func(e *colly.HTMLElement) {
+        blogLink = e.ChildAttr("a", "href")
+    })
+    defer c.OnHTMLDetach("#blogLink")
+
+    // Get details
     var keys []string
     var values []string
-
     c.OnHTML(".detailBox > dl", func(e *colly.HTMLElement) {
         e.ForEach("dt", func(_ int, el *colly.HTMLElement) {
             key := el.Text
@@ -51,14 +79,24 @@ func getNendoroidData(url string) []Details {
 
 	c.Visit(url)
 
-    var nendoroids []Details
+    var nendoroid Nendoroid
+
+    // Add name
+    nendoroid.name = name
+    // Add description
+    nendoroid.description = desc
+    // Add itemLink
+    nendoroid.itemLink = url
+    // Add blogLink
+    nendoroid.blogLink = blogLink
+    // Add details
     for i, key := range keys {
-        nendoroids = append(nendoroids, Details{key, values[i]})
+        nendoroid.details = append(nendoroid.details, Details{key, values[i]})
     }
 
-	return nendoroids
+	return nendoroid 
 }
 
-func saveNendoroidData() {
-
+func saveNendoroidData(nendo Nendoroid) {
+    
 }
