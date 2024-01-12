@@ -1,24 +1,31 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gocolly/colly"
 )
 
 func main() {
     println("Scraping Goodsmile Nendoroid Figure Data")
     
-	url := "https://www.goodsmile.info/en/product/8819/Nendoroid+Zelda+Breath+of+the+Wild+Ver.html"
-    // "https://www.goodsmile.info/en/product/15354/Nendoroid+Nino+Nakano+Wedding+Dress+Ver.html"
+	// url := "https://www.goodsmile.info/en/product/8819/Nendoroid+Zelda+Breath+of+the+Wild+Ver.html"
+    url := "https://www.goodsmile.info/en/product/15354/Nendoroid+Nino+Nakano+Wedding+Dress+Ver.html"
     // "https://www.goodsmile.info/en/product/15353/Nendoroid+Ninomae+Ina+nis.html"
 
     nendo := getNendoroidData(url)
 
-    for i, n := range nendo {
-        println(n[i])
+    for _, n := range nendo {
+        fmt.Printf("%s: %s\n", n.key, n.value)
     }
 }
 
-func getNendoroidData(url string) []string {
+type Tuple struct {
+    key string
+    value string
+}
+
+func getNendoroidData(url string) []Tuple {
 	userAgent := "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"
 
 	c := colly.NewCollector()
@@ -26,17 +33,23 @@ func getNendoroidData(url string) []string {
 		r.Headers.Set("User-Agent", userAgent)
 	})
 
-    var nendoroids []string
+    var keys []string
+    var values []string
 
     c.OnHTML(".detailBox > dl", func(e *colly.HTMLElement) {
-        e.ForEach("dt", func(_ int, el *colly.HTMLElement) {
-            text, _ := el.DOM.Html()
-            nendoroids = append(nendoroids, text)
-        })
+        key := e.ChildText("dt")
+        value := e.ChildText("dd")
+        keys = append(keys, key)
+        values = append(values, value)
     })
     defer c.OnHTMLDetach(".detailBox > dl")
 
 	c.Visit(url)
+
+    var nendoroids []Tuple
+    for i, key := range keys {
+        nendoroids = append(nendoroids, Tuple{key, values[i]})
+    }
 
 	return nendoroids
 }
