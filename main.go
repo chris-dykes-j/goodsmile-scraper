@@ -2,9 +2,15 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"log"
 	"math/rand"
+	"net/http"
 	"os"
+	"path"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -12,14 +18,22 @@ import (
 )
 
 func main() {
-	// url := "product/8819/Nendoroid+Zelda+Breath+of+the+Wild+Ver.html"
-	url := "product/15354/"
-	// url := "product/15353/Nendoroid+Ninomae+Ina+nis.html"
+	urls := []string{
+		"product/8819/",
+		"product/15354/",
+		"product/15353/",
+		"product/15397",
+	}
+	fmt.Println("Begin Scraping")
 
-    figure := getFigure(url)
-	saveFigureData(figure)
+	for _, url := range urls {
+		figure := getFigure(url)
+		saveFigureData(figure)
+		fmt.Println(figure)
+        sleep()
+	}
 
-	fmt.Println(figure)
+	fmt.Println("Complete")
 }
 
 type FigureData struct {
@@ -36,22 +50,22 @@ type Details struct {
 }
 
 type Figure struct {
-    English FigureData `json:"en"`
-    Japanese FigureData `json:"ja"`
-    Chinese FigureData `json:"zh"`
+	English  FigureData `json:"en"`
+	Japanese FigureData `json:"ja"`
+	Chinese  FigureData `json:"zh"`
 }
 
 func getFigure(url string) Figure {
-    var figure Figure
+	var figure Figure
 
-    figure.English = getFigureData("https://www.goodsmile.info/en/", url)
-    sleep()
-    figure.Japanese = getFigureData("https://www.goodsmile.info/ja/", url)
-    sleep()
-    figure.Chinese = getFigureData("https://www.goodsmile.info/zh/", url)
-    sleep()
+	figure.English = getFigureData("https://www.goodsmile.info/en/", url)
+	sleep()
+	figure.Japanese = getFigureData("https://www.goodsmile.info/ja/", url)
+	sleep()
+	figure.Chinese = getFigureData("https://www.goodsmile.info/zh/", url)
+	sleep()
 
-    return figure
+	return figure
 }
 
 func getFigureData(baseUrl string, itemUrl string) FigureData {
@@ -107,7 +121,6 @@ func getFigureData(baseUrl string, itemUrl string) FigureData {
 
 	c.Visit(baseUrl + itemUrl)
 
-
 	var figure FigureData
 
 	// Add name
@@ -124,10 +137,10 @@ func getFigureData(baseUrl string, itemUrl string) FigureData {
 	}
 
 	// Save images
-    if baseUrl == "https://www.goodsmile.info/en/" {
-        // saveImages(imageLinks)
-        fmt.Printf("Saving Images for %s", figure.Name)
-    }
+	if baseUrl == "https://www.goodsmile.info/en/" {
+		saveImages(imageLinks, figure.Name)
+		fmt.Printf("Saving Images for %s", figure.Name)
+	}
 
 	return figure
 }
@@ -160,21 +173,41 @@ func sleep() {
 	time.Sleep(time.Duration(randomNumber) * time.Second)
 }
 
-/*
-func saveImages(links []string) {
-    userAgent := "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"
+func saveImages(links []string, figureName string) {
+	userAgent := "Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0"
+	client := &http.Client{}
 
-    client := &http.Client{}
+	for _, link := range links {
+        req, err := http.NewRequest("GET", "https:" + link, nil)
+		if err != nil {
+			fmt.Println(err)
+		}
 
-    for _, link := range links {
-        req, _ := http.NewRequest("GET", link, nil)
-        req.Header.Set("User-Agent", userAgent)
-        res, _ := client.Do(req)
+		req.Header.Set("User-Agent", userAgent)
+		res, err := client.Do(req)
+		if err != nil {
+			fmt.Println(err)
+		}
 
-        imgPath := filepath
-        imgFile, _ := os.Create(imgPath)
+        imgPath := getDir(figureName)
+		imgFile, err := os.Create(imgPath + "/" + path.Base(link)) 
+		if err != nil {
+			log.Fatal(err)
+		}
 
-        io.Copy(imgFile, res.Body)
-    }
+		io.Copy(imgFile, res.Body)
+	}
 }
-*/
+
+func getDir(figureName string) string {
+	root := "/extra/nendoroid"
+    dir := filepath.Join(root, figureName)
+	if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(dir, os.ModePerm)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("Made %s directory\n", dir)
+	}
+	return dir 
+}
