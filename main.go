@@ -23,6 +23,7 @@ func main() {
 		"product/15354/",
 		"product/15353/",
 		"product/15397",
+        "product/7299/",
 	}
 	fmt.Println("Begin Scraping")
 
@@ -30,13 +31,14 @@ func main() {
 		figure := getFigure(url)
 		saveFigureData(figure)
 		fmt.Println(figure)
-        sleep()
+        sleepLong()
 	}
 
 	fmt.Println("Complete")
 }
 
 type FigureData struct {
+    ItemNumber  string    `json:"itemNumber"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	ItemLink    string    `json:"itemLink"`
@@ -75,6 +77,12 @@ func getFigureData(baseUrl string, itemUrl string) FigureData {
 	c.OnRequest(func(r *colly.Request) {
 		r.Headers.Set("User-Agent", userAgent)
 	})
+
+    // Get item number
+    var itemNumber string
+    c.OnHTML(".itemNum > span", func(e *colly.HTMLElement) {
+        itemNumber = strings.TrimSpace(e.Text)
+    })
 
 	// Get name
 	var name string
@@ -123,10 +131,12 @@ func getFigureData(baseUrl string, itemUrl string) FigureData {
 
 	var figure FigureData
 
+    // Add number
+    figure.ItemNumber = itemNumber
 	// Add name
-	figure.Name = strings.TrimSpace(name)
+	figure.Name = name
 	// Add description
-	figure.Description = strings.TrimSpace(desc)
+	figure.Description = desc
 	// Add itemLink
 	figure.ItemLink = itemUrl
 	// Add blogLink
@@ -170,6 +180,11 @@ func saveFigureData(figure Figure) {
 
 func sleep() {
 	randomNumber := rand.Float64()*(4-2) + 2
+	time.Sleep(time.Duration(randomNumber) * time.Second)
+}
+
+func sleepLong() {
+	randomNumber := rand.Float64()*(10-5) + 5
 	time.Sleep(time.Duration(randomNumber) * time.Second)
 }
 
