@@ -1,20 +1,7 @@
-DROP TABLE IF EXISTS nendoroid, nendoroid_name, nendoroid_description, nendoroid_details, nendoroid_link, nendoroid_blog_link;
+-- TODO Figure out the id crap. Then finish the insert statement.
 
-CREATE TABLE IF NOT EXISTS nendoroid
-(
-    id SERIAL PRIMARY KEY,
-    nendoroid_number INT
-);
-
-CREATE TABLE IF NOT EXISTS languages
-(
-  language_code CHAR(2) PRIMARY KEY, 
-  language_name VARCHAR(255) NOT NULL
-);
-
-INSERT INTO languages (language_code, language_name)
-VALUES ('en', 'English'), ('ja', 'Japanese'), ('zh', 'Chinese')
-ON CONFLICT (language_code) DO NOTHING;
+INSERT INTO nendoroid (nendoroid_number) VALUES ($1);
+INSERT INTO nendoroid_name (
 
 CREATE TABLE IF NOT EXISTS nendoroid_name
 (

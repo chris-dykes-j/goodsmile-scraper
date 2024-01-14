@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 
@@ -10,10 +12,12 @@ import (
 
 func main() {
     // Connect to database
-    conn, err := pgx.Connect(context.Background(), "connectionstring")
+    conn, err := pgx.Connect(context.Background(), "postgres://chris:@localhost:5432/figures") // local db because
     if err != nil {
+        fmt.Println("Damnit")
         log.Fatal(err)
     }
+    defer conn.Close(context.Background())
 
     // Run init script
     init, err := os.ReadFile("init.sql")
@@ -28,28 +32,33 @@ func main() {
     }
 
     // Read jsonl file, line by line
-    figure := Figure{}
-
-    // Create insert statements
-    err = insertFigure(figure, conn)
+    file, err := os.Open("../extract/test.jsonl")
     if err != nil {
         log.Fatal(err)
     }
+    decoder := json.NewDecoder(file)
+    for decoder.More() {
+        var figure Figure
+        if err := decoder.Decode(&figure); err != nil {
+            log.Fatal(err)
+        }
+        
+        // Create insert statements
+        err = insertFigure(figure, conn)
+        if err != nil {
+            log.Fatal(err)
+        }
+    }
 
-    // Commit transaction
 }
 
 func insertFigure(figure Figure, conn *pgx.Conn) error {
-    sql := createInsertScript(figure)
-    _, err := conn.Exec(context.Background(), sql)
+    _, err := conn.Exec(context.Background(), `
+        `)
     if err != nil {
-        log.Fatal(err)
+        return err
     }
     return nil
-}
-
-func createInsertScript(figfigure Figure) string {
-    return ""
 }
 
 // Input Data Structs
