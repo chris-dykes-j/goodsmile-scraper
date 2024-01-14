@@ -3,10 +3,8 @@
 This project's purpose is to collect figure data from the Goodsmile website (https://www.goodsmile.info/en/).
 
 ### Current Goals:
-- [ ] Transform json data for PostgreSQL database.
-- [ ] Create database scheme for data.
-- [ ] Load transformed data into dev database.
-- [ ] Fix bug issues (continuous).
+- [x] Create database scheme for data.
+- [ ] Load data into figure database.
 
 ### Next Development Phase:
 - [ ] Begin Web API rewrite. Include demo data and old data

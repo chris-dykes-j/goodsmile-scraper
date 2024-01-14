@@ -23,7 +23,7 @@ func main() {
 		"product/15354/",
 		"product/15353/",
 		"product/15397",
-        "product/7299/",
+		"product/7299/",
 	}
 	fmt.Println("Begin Scraping")
 
@@ -31,14 +31,14 @@ func main() {
 		figure := getFigure(url)
 		saveFigureData(figure)
 		fmt.Println(figure)
-        sleepLong()
+		sleepLong()
 	}
 
 	fmt.Println("Complete")
 }
 
 type FigureData struct {
-    ItemNumber  string    `json:"itemNumber"`
+	ItemNumber  string    `json:"itemNumber"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	ItemLink    string    `json:"itemLink"`
@@ -78,11 +78,11 @@ func getFigureData(baseUrl string, itemUrl string) FigureData {
 		r.Headers.Set("User-Agent", userAgent)
 	})
 
-    // Get item number
-    var itemNumber string
-    c.OnHTML(".itemNum > span", func(e *colly.HTMLElement) {
-        itemNumber = strings.TrimSpace(e.Text)
-    })
+	// Get item number
+	var itemNumber string
+	c.OnHTML(".itemNum > span", func(e *colly.HTMLElement) {
+		itemNumber = strings.TrimSpace(e.Text)
+	})
 
 	// Get name
 	var name string
@@ -131,8 +131,8 @@ func getFigureData(baseUrl string, itemUrl string) FigureData {
 
 	var figure FigureData
 
-    // Add number
-    figure.ItemNumber = itemNumber
+	// Add number
+	figure.ItemNumber = itemNumber
 	// Add name
 	figure.Name = name
 	// Add description
@@ -193,7 +193,7 @@ func saveImages(links []string, figureName string) {
 	client := &http.Client{}
 
 	for _, link := range links {
-        req, err := http.NewRequest("GET", "https:" + link, nil)
+		req, err := http.NewRequest("GET", "https:"+link, nil)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -204,8 +204,8 @@ func saveImages(links []string, figureName string) {
 			fmt.Println(err)
 		}
 
-        imgPath := getDir(figureName)
-		imgFile, err := os.Create(imgPath + "/" + path.Base(link)) 
+		imgPath := getDir(figureName)
+		imgFile, err := os.Create(imgPath + "/" + path.Base(link))
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -216,7 +216,7 @@ func saveImages(links []string, figureName string) {
 
 func getDir(figureName string) string {
 	root := "/extra/nendoroid"
-    dir := filepath.Join(root, figureName)
+	dir := filepath.Join(root, figureName)
 	if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
 		err := os.Mkdir(dir, os.ModePerm)
 		if err != nil {
@@ -224,5 +224,5 @@ func getDir(figureName string) string {
 		}
 		fmt.Printf("Made %s directory\n", dir)
 	}
-	return dir 
+	return dir
 }
