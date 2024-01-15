@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS nendoroid_description
 (
   nendoroid_id INT NOT NULL,
   language_code CHAR(2) NOT NULL,
-  text VARCHAR(255) NOT NULL,
+  text TEXT NOT NULL,
   PRIMARY KEY (nendoroid_id, language_code),
   FOREIGN KEY (nendoroid_id) REFERENCES nendoroid (id),
   FOREIGN KEY (language_code) REFERENCES languages (language_code)
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS nendoroid_details
 (
   nendoroid_id INT NOT NULL,
   language_code CHAR(2) NOT NULL,
-  details JSONB,
+  details JSONB NOT NULL,
   PRIMARY KEY (nendoroid_id, language_code),
   FOREIGN KEY (nendoroid_id) REFERENCES nendoroid (id),
   FOREIGN KEY (language_code) REFERENCES languages (language_code)
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS nendoroid_link
 (
   nendoroid_id INT NOT NULL,
   language_code CHAR(2) NOT NULL,
-  text VARCHAR(255) NOT NULL,
+  text TEXT NOT NULL,
   PRIMARY KEY (nendoroid_id, language_code),
   FOREIGN KEY (nendoroid_id) REFERENCES nendoroid (id),
   FOREIGN KEY (language_code) REFERENCES languages (language_code)
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS nendoroid_blog_link
 (
   nendoroid_id INT NOT NULL,
   language_code CHAR(2) NOT NULL,
-  text VARCHAR(255) NOT NULL,
+  text TEXT NOT NULL,
   PRIMARY KEY (nendoroid_id, language_code),
   FOREIGN KEY (nendoroid_id) REFERENCES nendoroid (id),
   FOREIGN KEY (language_code) REFERENCES languages (language_code)
