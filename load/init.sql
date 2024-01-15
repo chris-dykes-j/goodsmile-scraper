@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS nendoroid, nendoroid_name, nendoroid_description, nendoroid
 CREATE TABLE IF NOT EXISTS nendoroid
 (
     id SERIAL PRIMARY KEY,
-    nendoroid_number INT
+    item_number INT
 );
 
 CREATE TABLE IF NOT EXISTS languages
