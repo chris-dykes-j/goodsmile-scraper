@@ -3,6 +3,7 @@
 This project's purpose is to collect figure data from the Goodsmile website (https://www.goodsmile.info/en/).
 
 ### Current Goals:
+- [ ] Refactor and fix errors in scripts.
 - [ ] Begin Web API rewrite. Include demo data and old data.
 - [ ] Build CLI Interaction
 - [ ] Scrape by Year and Month to minimize traffic.
