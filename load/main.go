@@ -64,7 +64,7 @@ func insertNendoroid(figure Figure, conn *pgx.Conn) error {
 	}
 
 	_, err = conn.Exec(context.Background(), `
-        SELECT insert_nendoroid(
+        SELECT insert_nendo(
             $1::int,
             $2::varchar, $3::varchar, $4::varchar,
             $5::text, $6::text, $7::text,
